@@ -51,7 +51,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     created_date = Column(DateTime, default=datetime.utcnow())
-    email = Column(EmailType)
+    email = Column(String)
     username = Column(String, unique=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
@@ -67,5 +67,6 @@ class Post(Base):
     is_active = Column(Boolean, default=True)
     title = Column(String)
     body = Column(String)
+    owner_id = Column(Integer, ForeignKey("users.id"))
 
-    owner_id = relationship("User", back_populates="post")
+    owner = relationship("User", back_populates="post")
