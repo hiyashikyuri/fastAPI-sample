@@ -11,7 +11,6 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-
 from pydantic import BaseModel
 
 #
@@ -73,3 +72,19 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def create_post(db: Session, user_id: int, title: str, body: str):
+    db_post = models.Post(title=title, body=body)
+    db.add(db_post)
+    db.commit()
+    db.refresh(db_post)
+    return db_post
+
+
+def get_post(db, post_id: int):
+    return db.query(models.Post).filter(models.Post.id == post_id).first()
+
+
+def post_list(db):
+    return db.query(models.Post).all()

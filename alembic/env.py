@@ -1,3 +1,4 @@
+import os, sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -7,6 +8,13 @@ from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+
+import importlib
+from sqlalchemy.schema import MetaData
+
+from app.database import Base
+
 config = context.config
 
 # Interpret the config file for Python logging.
@@ -17,7 +25,35 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+
+
+target_models = [
+    'app.models'
+]
+
+
+def import_model_bases():
+    """import all target models base metadatas."""
+    lst = list(map(
+        lambda x: importlib.import_module(x).Base.metadata,
+        target_models
+    ))
+    return lst
+
+
+def combine_metadata(lst):
+    m = MetaData()
+    for metadata in lst:
+        for t in metadata.tables.values():
+            t.tometadata(m)
+    return m
+
+
+target_metadata = combine_metadata(import_model_bases())
+
+# target_metadata = Base.metadata  # メタデータをセット
+
+# target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

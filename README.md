@@ -6,6 +6,12 @@ FastAPIでシンプルなAPIを構築する際のテンプレとして作成し�
 # サーバー起動
 uvicorn app.main:app --reload
 
+# migrationファイル生成
+alembic revision -m "message" --autogenerate
+
+# migration最新版適用
+alembic upgrade head
+
 ```
 
 ### 内容
