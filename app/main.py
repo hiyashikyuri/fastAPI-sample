@@ -101,7 +101,10 @@ def post_list(db: Session = Depends(get_db)):
 
 @app.get("/posts/{post_id}")
 def post_detail(post_id: int, db: Session = Depends(get_db)):
-    return crud.get_post(db, post_id=post_id)
+   post = crud.get_post(db, post_id=post_id)
+   if post is None:
+       raise HTTPException(status_code=404, detail="Post does not exists")
+   return post
 
 # @app.get("/users/me/items/")
 # async def read_own_items(current_user: User = Depends(get_current_active_user)):
