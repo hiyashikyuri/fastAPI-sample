@@ -74,8 +74,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-def create_post(db: Session, user_id: int, title: str, body: str):
-    db_post = models.Post(title=title, body=body)
+def create_post(db: Session, user_id: int, title: str, body: str, url: str):
+    db_post = models.Post(title=title, body=body, url=url)
     db.add(db_post)
     db.commit()
     db.refresh(db_post)

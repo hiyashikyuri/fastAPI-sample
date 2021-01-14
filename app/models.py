@@ -66,6 +66,7 @@ class Post(Base):
     created_date = Column(DateTime, default=datetime.utcnow())
     is_active = Column(Boolean, default=True)
     title = Column(String)
+    url = Column(String)
     body = Column(String)
     owner_id = Column(Integer, ForeignKey("users.id"))
 

@@ -1,2 +1,9 @@
 .idea
 sql_app.db
+
+**/__pycache__
+
+.DS_store
+media/
+
+**.swp
