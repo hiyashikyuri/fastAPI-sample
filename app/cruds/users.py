@@ -23,20 +23,8 @@ def get_password_hash(password):
     return pwd_context.hash(password.encode('utf8'))
 
 
-def get_user(db, username: str):
-    return db.query(User).filter(User.username == username).first()
-
-
-def create_user(db: Session, user: UserCreate):
-    db_user = User(username=user.username, hashed_password=get_password_hash(user.password))
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
 def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+    user = find_one(fake_db, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -53,3 +41,15 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def find_one(db, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+
+def save(db: Session, user: UserCreate):
+    db_user = User(username=user.username, hashed_password=get_password_hash(user.password))
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user

@@ -4,13 +4,9 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from jose import JWTError, jwt
 from datetime import timedelta
 
-from .database import Base
-
-from .cruds.users import get_user, authenticate_user, create_access_token, SECRET_KEY, ALGORITHM
-from .database import SessionLocal, engine
+from .cruds.users import find_one, authenticate_user, create_access_token, SECRET_KEY, ALGORITHM
+from .database import SessionLocal
 from .schemas.user import Token
-
-# Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -43,7 +39,7 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
     except JWTError:
         raise credentials_exception
     # user = get_user(db, username=token_data.username) シンプルにするために
-    user = get_user(db, username=token_data)
+    user = find_one(db, username=token_data)
     if user is None:
         raise credentials_exception
     return user
