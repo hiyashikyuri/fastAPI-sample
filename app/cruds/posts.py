@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from ..models.post import Post
 
 
-def create_post(db: Session, user_id: int, title: str, body: str, url: str):
-    db_post = Post(title=title, body=body, url=url)
+def create_post(db: Session, user_id: int, title: str, body: str):
+    db_post = Post(title=title, body=body, user_id=user_id)
     db.add(db_post)
     db.commit()
     db.refresh(db_post)

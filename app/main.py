@@ -10,7 +10,7 @@ from .cruds.users import get_user, authenticate_user, create_access_token, SECRE
 from .database import SessionLocal, engine
 from .schemas.user import Token
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

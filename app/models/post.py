@@ -11,8 +11,7 @@ class Post(Base):
     created_date = Column(DateTime, default=datetime.utcnow())
     is_active = Column(Boolean, default=True)
     title = Column(String)
-    url = Column(String)
     body = Column(String)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
 
-    owner = relationship("User", back_populates="post")
+    user = relationship("User", back_populates="post")

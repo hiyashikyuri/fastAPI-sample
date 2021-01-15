@@ -1,8 +1,8 @@
-"""create tables
+"""recreated migration file
 
-Revision ID: c6a8536a2506
+Revision ID: 56eea5633f11
 Revises: 
-Create Date: 2021-01-12 08:45:23.560535
+Create Date: 2021-01-15 20:53:04.107740
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c6a8536a2506'
+revision = '56eea5633f11'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,8 +34,8 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('body', sa.String(), nullable=True),
-    sa.Column('owner_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

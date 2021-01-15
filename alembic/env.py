@@ -13,6 +13,8 @@ sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..'
 import importlib
 from sqlalchemy.schema import MetaData
 
+from app.database import Base
+
 config = context.config
 
 # Interpret the config file for Python logging.
@@ -24,12 +26,9 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from app.models.user import User
-from app.models.post import Post
-
 target_models = [
     'app.models.user',
-    'app.models.post'
+    'app.models.post',
 ]
 
 

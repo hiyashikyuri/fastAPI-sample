@@ -12,14 +12,11 @@ Base.metadata.create_all(bind=engine)
 router = APIRouter()
 
 
-@router.post("/posts/", status_code=status.HTTP_201_CREATED)
-def create(title: str, body: str, file: UploadFile = File(...), db: Session = Depends(get_db),
+@router.post("/posts/")
+def create(title: str, body: str, db: Session = Depends(get_db),
            current_user: User = Depends(get_current_user)):
     user_id = current_user.id
-    with open("media/" + file.filename, "wb") as image:
-        shutil.copyfileobj(file.file, image)
-    url = str("media" + file.filename)
-    return create_post(db=db, user_id=user_id, title=title, body=body, url=url)
+    return create_post(db=db, user_id=user_id, title=title, body=body)
 
 
 @router.get("/posts/")
