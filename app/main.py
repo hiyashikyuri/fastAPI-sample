@@ -6,9 +6,9 @@ from datetime import timedelta
 
 from .database import Base
 
-from .cruds.users import get_user, create_user, authenticate_user, create_access_token, SECRET_KEY, ALGORITHM
+from .cruds.users import get_user, authenticate_user, create_access_token, SECRET_KEY, ALGORITHM
 from .database import SessionLocal, engine
-from .schemas.user import Token, UserCreate
+from .schemas.user import Token
 
 Base.metadata.create_all(bind=engine)
 
