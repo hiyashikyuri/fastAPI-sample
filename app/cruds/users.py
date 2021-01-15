@@ -3,7 +3,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from ..main import models
+from ..models.user import User
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -30,11 +30,11 @@ def get_password_hash(password):
 
 
 def get_user(db, username: str):
-    return db.query(models.User).filter(models.User.username == username).first()
+    return db.query(User).filter(User.username == username).first()
 
 
 def create_user(db: Session, user: UserCreate):
-    db_user = models.User(username=user.username, hashed_password=get_password_hash(user.password))
+    db_user = User(username=user.username, hashed_password=get_password_hash(user.password))
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

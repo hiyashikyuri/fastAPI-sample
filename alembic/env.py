@@ -24,9 +24,12 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
+from app.models.user import User
+from app.models.post import Post
 
 target_models = [
-    'app.models'
+    'app.models.user',
+    'app.models.post'
 ]
 
 

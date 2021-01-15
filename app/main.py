@@ -9,12 +9,16 @@ from datetime import datetime, timedelta
 import shutil
 
 from . import models
+from .database import Base
+from .models.user import User
+from .models.post import Post
+
 from .cruds.posts import create_post, post_list, get_post
 from .cruds.users import get_user, create_user, authenticate_user, create_access_token, SECRET_KEY, ALGORITHM
 from .database import SessionLocal, engine
 from .schemas import Token, UserCreate
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -71,7 +75,7 @@ async def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth
 
 
 @app.get("/users/me/")
-async def read_users_me(current_user: models.User = Depends(get_current_user)):
+async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
@@ -82,7 +86,7 @@ def user(user: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/posts/", status_code=status.HTTP_201_CREATED)
 def create(title: str, body: str, file: UploadFile = File(...), db: Session = Depends(get_db),
-           current_user: models.User = Depends(get_current_user)):
+           current_user: User = Depends(get_current_user)):
     user_id = current_user.id
     with open("media/" + file.filename, "wb") as image:
         shutil.copyfileobj(file.file, image)
