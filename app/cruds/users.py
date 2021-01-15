@@ -1,16 +1,10 @@
 from datetime import datetime, timedelta
 from typing import Optional
-
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-
-from ..models.user import User
-
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-
+from ..models.user import User
 from ..schemas.user import UserCreate
 
 SECRET_KEY = "b3226dd82a51d689793c805021c665a3b32ee39149fa651af5871af221b45cbd"
