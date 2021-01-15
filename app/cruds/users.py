@@ -3,7 +3,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+from ..main import models
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -11,20 +11,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from pydantic import BaseModel
-
-#
-#
-# def get_items(db: Session, skip: int = 0, limit: int = 100):
-#     return db.query(models.Item).offset(skip).limit(limit).all()
-#
-#
-# def create_user_item(db: Session, item: schemas.ItemCreate):
-#     db_item = models.Item(**item.dict())
-#     db.add(db_item)
-#     db.commit()
-#     db.refresh(db_item)
-#     return db_item
+from ..schemas import UserCreate
 
 SECRET_KEY = "b3226dd82a51d689793c805021c665a3b32ee39149fa651af5871af221b45cbd"
 ALGORITHM = "HS256"
@@ -46,7 +33,7 @@ def get_user(db, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
 
-def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Session, user: UserCreate):
     db_user = models.User(username=user.username, hashed_password=get_password_hash(user.password))
     db.add(db_user)
     db.commit()
@@ -72,19 +59,3 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-def create_post(db: Session, user_id: int, title: str, body: str, url: str):
-    db_post = models.Post(title=title, body=body, url=url)
-    db.add(db_post)
-    db.commit()
-    db.refresh(db_post)
-    return db_post
-
-
-def get_post(db, post_id: int):
-    return db.query(models.Post).filter(models.Post.id == post_id).first()
-
-
-def post_list(db):
-    return db.query(models.Post).all()

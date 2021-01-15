@@ -7,8 +7,12 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import shutil
-from . import crud, models, schemas
+
+from . import models
+from .cruds.posts import create_post, post_list, get_post
+from .cruds.users import get_user, create_user, authenticate_user, create_access_token, SECRET_KEY, ALGORITHM
 from .database import SessionLocal, engine
+from .schemas import Token, UserCreate
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -35,7 +39,7 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, crud.SECRET_KEY, algorithms=[crud.ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -44,21 +48,15 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
     except JWTError:
         raise credentials_exception
     # user = get_user(db, username=token_data.username) シンプルにするために
-    user = crud.get_user(db, username=token_data)
+    user = get_user(db, username=token_data)
     if user is None:
         raise credentials_exception
     return user
 
 
-# async def get_current_active_user(current_user: User = Depends(get_current_user)):
-#     if current_user.disabled:
-#         raise HTTPException(status_code=400, detail="Inactive user")
-#     return current_user
-
-
-@app.post("/token", response_model=schemas.Token)
+@app.post("/token", response_model=Token)
 async def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
-    user = crud.authenticate_user(db, form_data.username, form_data.password)
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,7 +64,7 @@ async def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = crud.create_access_token(
+    access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
@@ -78,46 +76,28 @@ async def read_users_me(current_user: models.User = Depends(get_current_user)):
 
 
 @app.post("/users/")
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    return crud.create_user(db=db, user=user)
+def user(user: UserCreate, db: Session = Depends(get_db)):
+    return create_user(db=db, user=user)
 
 
 @app.post("/posts/", status_code=status.HTTP_201_CREATED)
-def create_post(title: str, body: str, file: UploadFile = File(...), db: Session = Depends(get_db),
-                current_user: models.User = Depends(get_current_user)):
+def create(title: str, body: str, file: UploadFile = File(...), db: Session = Depends(get_db),
+           current_user: models.User = Depends(get_current_user)):
     user_id = current_user.id
     with open("media/" + file.filename, "wb") as image:
         shutil.copyfileobj(file.file, image)
     url = str("media" + file.filename)
-    return crud.create_post(db=db, user_id=user_id, title=title, body=body, url=url)
+    return create_post(db=db, user_id=user_id, title=title, body=body, url=url)
 
 
 @app.get("/posts/")
-def post_list(db: Session = Depends(get_db)):
-    return crud.post_list(db=db)
+def post(db: Session = Depends(get_db)):
+    return post_list(db=db)
 
 
 @app.get("/posts/{post_id}")
 def post_detail(post_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-   post = crud.get_post(db, post_id=post_id)
-   if post is None:
-       raise HTTPException(status_code=404, detail="Post does not exists")
-   return post
-
-
-# @app.get("/users/me/items/")
-# async def read_own_items(current_user: User = Depends(get_current_active_user)):
-#     return [{"item_id": "Foo", "owner": current_user.username}]
-#
-#
-# @app.post("/items/", response_model=schemas.Item)
-# def create_item_for_user(
-#         item: schemas.ItemCreate, db: Session = Depends(get_db)
-# ):
-#     return crud.create_user_item(db=db, item=item)
-#
-#
-# @app.get("/items/", response_model=List[schemas.Item])
-# def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-#     items = crud.get_items(db, skip=skip, limit=limit)
-#     return items
+    post = get_post(db, post_id=post_id)
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post does not exists")
+    return post
