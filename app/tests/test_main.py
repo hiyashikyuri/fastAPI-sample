@@ -15,22 +15,39 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 Base.metadata.create_all(bind=engine)
 
 
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
+def temp_db(f):
+    def func(SessionLocal, *args, **kwargs):
+        # テスト用のDBに接続するためのsessionmaker instanse
+        #  (SessionLocal) をfixtureから受け取る
 
+        def override_get_db():
+            try:
+                db = SessionLocal()
+                yield db
+            finally:
+                db.close()
 
-app.dependency_overrides[get_db] = override_get_db
+        # fixtureから受け取るSessionLocalを使うようにget_dbを強制的に変更
+        app.dependency_overrides[get_db] = override_get_db
+        # Run tests
+        f(*args, **kwargs)
+        # get_dbを元に戻す
+        app.dependency_overrides[get_db] = get_db
+
+    return func
+
 
 client = TestClient(app)
 user = {"username": "test", "email": "deadpool@example.com", "password": "chimichangas4life"}
 
 
+def create_user():
+    return client.post("/users", json=user)
+
+
+@temp_db
 def test_create_user():
-    response = client.post("/users", json=user)
+    response = create_user()
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["email"] == "deadpool@example.com"
@@ -38,7 +55,9 @@ def test_create_user():
     user["id"] = data["id"]
 
 
+@temp_db
 def test_get_token():
+    create_user()
     response = client.post("/token", data={"username": user["username"], "password": user["password"]})
     assert response.status_code == 200, response.text
     data = response.json()
