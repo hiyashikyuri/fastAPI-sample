@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from ..schemas import UserCreate
+from ..schemas.user import UserCreate
 
 SECRET_KEY = "b3226dd82a51d689793c805021c665a3b32ee39149fa651af5871af221b45cbd"
 ALGORITHM = "HS256"

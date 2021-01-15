@@ -24,17 +24,3 @@ class UserInDB(User):
 class UserCreate(User):
     password: str
     email: str
-
-
-class PostBase(BaseModel):
-    title: str
-    body: str
-
-
-class PostList(PostBase):
-    created_date: Optional[datetime]
-    owner_id: int
-    owner: User
-
-    class Config:
-        orm_mode: True

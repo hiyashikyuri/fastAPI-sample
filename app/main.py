@@ -16,7 +16,7 @@ from .models.post import Post
 from .cruds.posts import create_post, post_list, get_post
 from .cruds.users import get_user, create_user, authenticate_user, create_access_token, SECRET_KEY, ALGORITHM
 from .database import SessionLocal, engine
-from .schemas import Token, UserCreate
+from .schemas.user import Token, UserCreate
 
 Base.metadata.create_all(bind=engine)
 
