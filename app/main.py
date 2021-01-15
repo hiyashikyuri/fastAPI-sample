@@ -88,8 +88,6 @@ def create_post(title: str, body: str, file: UploadFile = File(...), db: Session
     user_id = current_user.id
     with open("media/" + file.filename, "wb") as image:
         shutil.copyfileobj(file.file, image)
-
-
     url = str("media" + file.filename)
     return crud.create_post(db=db, user_id=user_id, title=title, body=body, url=url)
 
@@ -100,11 +98,12 @@ def post_list(db: Session = Depends(get_db)):
 
 
 @app.get("/posts/{post_id}")
-def post_detail(post_id: int, db: Session = Depends(get_db)):
+def post_detail(post_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
    post = crud.get_post(db, post_id=post_id)
    if post is None:
        raise HTTPException(status_code=404, detail="Post does not exists")
    return post
+
 
 # @app.get("/users/me/items/")
 # async def read_own_items(current_user: User = Depends(get_current_active_user)):
