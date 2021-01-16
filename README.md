@@ -30,7 +30,7 @@ alembic
 pytest
 
 # lint
-flake8 app --exclude tests
+flake8 app --max-line-length 120 --exclude main.py
 
 ```
 

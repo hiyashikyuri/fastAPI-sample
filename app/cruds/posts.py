@@ -9,9 +9,7 @@ def find_all(db):
 
 
 def find_one(db, post_id: int, user_id: int):
-    return db.query(Post).filter(
-        Post.id == post_id, Post.user_id == user_id
-    ).first()
+    return db.query(Post).filter(Post.id == post_id, Post.user_id == user_id).first()
 
 
 def save(db: Session, user_id: int, title: str, body: str):

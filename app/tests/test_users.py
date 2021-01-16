@@ -40,11 +40,7 @@ def temp_db(f):
 
 
 client = TestClient(app)
-user = {
-    "username": "test",
-    "email": "deadpool@example.com",
-    "password": "chimichangas4life"
-}
+user = {"username": "test", "email": "deadpool@example.com", "password": "chimichangas4life"}
 
 
 def create_user():
@@ -64,10 +60,7 @@ def test_create_user():
 @temp_db
 def test_get_token():
     create_user()
-    response = client.post(
-        "/token",
-        data={"username": user["username"], "password": user["password"]}
-    )
+    response = client.post("/token", data={"username": user["username"], "password": user["password"]})
     assert response.status_code == 200, response.text
     data = response.json()
     assert "access_token" in data

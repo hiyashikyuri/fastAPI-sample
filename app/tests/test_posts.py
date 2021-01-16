@@ -11,9 +11,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
-TestingSessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine
-)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
 client = TestClient(app)
@@ -43,46 +41,24 @@ def temp_db(f):
 
 # ゆくゆくはこfixtureにまとめたい
 def set_authorization():
-    user_data = {
-        "username": "test",
-        "email": "deadpool@example.com",
-        "password": "chimichangas4life"
-    }
+    user_data = {"username": "test", "email": "deadpool@example.com", "password": "chimichangas4life"}
     created_user = client.post("/users", json=user_data).json()
     token = client.post(
-        "/token",
-        data={
-            "username": user_data["username"],
-            "password": user_data["password"]
-        }
+        "/token", data={"username": user_data["username"], "password": user_data["password"]}
     ).json()["access_token"]
 
-    return {
-        "user": created_user,
-        "access_token": token
-    }
+    return {"user": created_user, "access_token": token}
 
 
 @temp_db
 def test_find_all():
     credential = set_authorization()
-    post = {
-        "title": "title",
-        "body": "body",
-        "user_id": credential["user"]["id"]
-    }
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
     created_post_data = client.post(
-        "/posts",
-        data=json.dumps(post),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        "/posts", data=json.dumps(post), headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     ).json()
     searched_post = client.get(
-        "/posts",
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        "/posts", headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     )
     assert searched_post.status_code == 200, searched_post.text
     data = searched_post.json()
@@ -93,22 +69,13 @@ def test_find_all():
 @temp_db
 def test_find_one():
     credential = set_authorization()
-    post = {
-        "title": "title",
-        "body": "body",
-        "user_id": credential["user"]["id"]
-    }
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
     created_post_data = client.post(
-        "/posts", data=json.dumps(post),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        "/posts", data=json.dumps(post), headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     ).json()
     searched_post = client.get(
         "/posts/{post_id}".format(post_id=created_post_data["id"]),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     )
     assert searched_post.status_code == 200, searched_post.text
     data = searched_post.json()
@@ -119,16 +86,9 @@ def test_find_one():
 @temp_db
 def test_create():
     credential = set_authorization()
-    post = {
-        "title": "title",
-        "body": "body",
-        "user_id": credential["user"]["id"]
-    }
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
     response = client.post(
-        "/posts", data=json.dumps(post),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        "/posts", data=json.dumps(post), headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     )
     assert response.status_code == 200, response.text
     data = response.json()
@@ -139,25 +99,16 @@ def test_create():
 @temp_db
 def test_update():
     credential = set_authorization()
-    post = {
-        "title": "title",
-        "body": "body",
-        "user_id": credential["user"]["id"]
-    }
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
     created_post = client.post(
-        "/posts", data=json.dumps(post),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        "/posts", data=json.dumps(post), headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     ).json()
     created_post["title"] = "updatetext"
     created_post["body"] = "updatetext"
 
     response = client.put(
         "/posts/{}".format(created_post["id"]), data=json.dumps(created_post),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     )
 
     assert response.status_code == 200, response.text
@@ -169,22 +120,13 @@ def test_update():
 @temp_db
 def test_delete():
     credential = set_authorization()
-    post = {
-        "title": "title",
-        "body": "body",
-        "user_id": credential["user"]["id"]
-    }
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
     created_post = client.post(
-        "/posts", data=json.dumps(post),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        "/posts", data=json.dumps(post), headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     ).json()
     response = client.delete(
         "/posts/{}".format(created_post["id"]),
-        headers={
-            'Authorization': 'Bearer {}'.format(credential["access_token"])
-        }
+        headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}
     )
 
     assert response.status_code == 200, response.text
