@@ -12,7 +12,6 @@ class PostBase(BaseModel):
 class PostCreate(BaseModel):
     title: str
     body: str
-    user_id: int
 
 
 class PostUpdate(BaseModel):
