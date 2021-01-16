@@ -119,6 +119,3 @@ def test_delete():
                              headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
 
     assert response.status_code == 200, response.text
-    # data = response.json()
-    # assert data["title"] == created_post["title"]
-    # assert data["body"] == created_post["body"]
