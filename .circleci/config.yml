@@ -1,21 +1,32 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@0.2.1
+  python: circleci/python@0.3.2
 
 jobs:
   build-and-test:
-    executor: python/default
+    executor:
+      name: python/default
+      tag: '3.7'
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
+#      - run:
+#          name: Setup Virtual env
+#          command: |
+#            virtualenv -p python3.7 env
+#            echo "source ./env/bin/activate" >> $BASH_ENV
       - run:
-          command: ./manage.py test
+          name: Install Dependencies
+          command: pip install -r requirements.txt
+      - run:
           name: Test
+          command: pytest
 
 workflows:
-  main:
+  build-test-and-deploy:
     jobs:
-      - build-and-test
+      - build-and-test:
+          filters:
+            branches:
+              only:
+                - cicd-demo-dev
