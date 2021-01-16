@@ -89,3 +89,21 @@ def test_create():
     data = response.json()
     assert data["title"] == post["title"]
     assert "id" in data
+
+
+@temp_db
+def test_update():
+    credential = set_authorization()
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
+    created_post = client.post("/posts", data=json.dumps(post),
+                               headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}).json()
+    created_post["title"] = "updatetext"
+    created_post["body"] = "updatetext"
+
+    response = client.put("/posts/{}".format(created_post["id"]), data=json.dumps(created_post),
+                          headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
+
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["title"] == created_post["title"]
+    assert data["body"] == created_post["body"]

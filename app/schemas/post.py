@@ -15,6 +15,12 @@ class PostCreate(BaseModel):
     user_id: int
 
 
+class PostUpdate(BaseModel):
+    id: int
+    title: str
+    body: str
+
+
 class PostList(PostBase):
     created_date: Optional[datetime]
     owner_id: int
