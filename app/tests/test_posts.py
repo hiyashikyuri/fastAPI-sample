@@ -53,15 +53,16 @@ def set_authorization():
 
 
 @temp_db
-def test_create():
+def test_find_all():
     credential = set_authorization()
     post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
-    response = client.post("/posts", data=json.dumps(post),
-                           headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["title"] == post["title"]
-    assert "id" in data
+    created_post_data = client.post("/posts", data=json.dumps(post),
+                                    headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}).json()
+    searched_post = client.get("/posts", headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
+    assert searched_post.status_code == 200, searched_post.text
+    data = searched_post.json()
+    # TODO, 自分だけのpostsだけにする設定加えたい
+    assert created_post_data in data
 
 
 @temp_db
@@ -76,3 +77,15 @@ def test_find_one():
     data = searched_post.json()
     assert "title" in data
     assert "body" in data
+
+
+@temp_db
+def test_create():
+    credential = set_authorization()
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
+    response = client.post("/posts", data=json.dumps(post),
+                           headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["title"] == post["title"]
+    assert "id" in data
