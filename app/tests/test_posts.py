@@ -107,3 +107,18 @@ def test_update():
     data = response.json()
     assert data["title"] == created_post["title"]
     assert data["body"] == created_post["body"]
+
+
+@temp_db
+def test_delete():
+    credential = set_authorization()
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
+    created_post = client.post("/posts", data=json.dumps(post),
+                               headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}).json()
+    response = client.delete("/posts/{}".format(created_post["id"]),
+                             headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
+
+    assert response.status_code == 200, response.text
+    # data = response.json()
+    # assert data["title"] == created_post["title"]
+    # assert data["body"] == created_post["body"]

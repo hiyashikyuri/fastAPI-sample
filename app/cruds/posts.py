@@ -27,3 +27,10 @@ def update(db: Session, post_id: int, title: str, body: str):
     db.commit()
     db.refresh(db_post)
     return db_post
+
+
+def delete(db: Session, post_id: int):
+    db_post = find_one(db, post_id)
+    db.delete(db_post)
+    db.commit()
+    return True
