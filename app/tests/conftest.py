@@ -29,3 +29,12 @@ def SessionLocal():
 
     # Drop the test database
     drop_database(TEST_SQLALCHEMY_DATABASE_URL)
+
+
+@pytest.fixture(scope='function', autouse=True)
+def set_authorization():
+    # 入ってる
+    # どうにかしてse_authoriationの中身を渡したい
+
+    print('set_authorization')
+

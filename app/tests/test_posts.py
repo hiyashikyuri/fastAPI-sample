@@ -1,3 +1,4 @@
+import json
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +14,7 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
+client = TestClient(app)
 
 
 def temp_db(f):
@@ -37,33 +39,28 @@ def temp_db(f):
     return func
 
 
-client = TestClient(app)
-user = {"username": "test", "email": "deadpool@example.com", "password": "chimichangas4life"}
+# ゆくゆくはこfixtureにまとめたい
+def set_authorization():
+    user_data = {"username": "test", "email": "deadpool@example.com", "password": "chimichangas4life"}
+    created_user = client.post("/users", json=user_data).json()
+    token = client.post(
+        "/token", data={"username": user_data["username"], "password": user_data["password"]}).json()["access_token"]
+
+    return {
+        "user": created_user,
+        "access_token": token
+    }
+
+
 post = {"title": "title", "body": "body", "user_id": None}
-import json
-
-
-def create_user():
-    return client.post("/users", json=user)
-
-
-def create_token():
-    return client.post("/token", data={"username": user["username"], "password": user["password"]})
 
 
 @temp_db
 def test_create():
-    created_user = create_user().json()
-    token = create_token().json()["access_token"]
-
-    post["user_id"] = created_user["id"]
-
-    response = client.post("/posts", data=json.dumps(post), headers={'Authorization': 'Bearer {}'.format(token)})
-    print('------')
-    print(response.text)
-    print(json.dumps(post))
-    print('------')
-
+    credential = set_authorization()
+    post["user_id"] = credential["user"]["id"]
+    response = client.post("/posts", data=json.dumps(post),
+                           headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["title"] == post["title"]
