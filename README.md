@@ -3,7 +3,9 @@ FastAPIでシンプルなAPIを構築する際のテンプレとして作成し�
 
 ### コマンド
 ```
-# サーバー起動
+# サーバー起動 / どちらでもいけます
+python run.py
+
 uvicorn app.main:app --reload
 
 # migrationファイル生成
