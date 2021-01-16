@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from jose import JWTError, jwt
+from jose import jwt
 from passlib.context import CryptContext
 from ..models.user import User
 from ..schemas.user import UserCreate
@@ -48,7 +48,11 @@ def find_one(db, username: str):
 
 
 def save(db: Session, user: UserCreate):
-    db_user = User(username=user.username, hashed_password=get_password_hash(user.password), email=user.email)
+    db_user = User(
+        username=user.username,
+        hashed_password=get_password_hash(user.password),
+        email=user.email
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

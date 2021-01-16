@@ -10,7 +10,9 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -38,7 +40,11 @@ def temp_db(f):
 
 
 client = TestClient(app)
-user = {"username": "test", "email": "deadpool@example.com", "password": "chimichangas4life"}
+user = {
+    "username": "test",
+    "email": "deadpool@example.com",
+    "password": "chimichangas4life"
+}
 
 
 def create_user():
@@ -58,7 +64,10 @@ def test_create_user():
 @temp_db
 def test_get_token():
     create_user()
-    response = client.post("/token", data={"username": user["username"], "password": user["password"]})
+    response = client.post(
+        "/token",
+        data={"username": user["username"], "password": user["password"]}
+    )
     assert response.status_code == 200, response.text
     data = response.json()
     assert "access_token" in data

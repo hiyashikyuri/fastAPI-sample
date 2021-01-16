@@ -24,6 +24,17 @@ SQLAlchemy ver:
 alembic 
 ```
 
+### Lintやテスト
+```
+# テスト
+pytest
+
+# lint
+flake8 app --exclude tests
+
+```
+
+
 ### ライセンス
 個人開発・商用利用問わずご自由にご活用ください。
 また、利用する際はtwitterでのシェアや、引用として記載していただけますと幸いです。

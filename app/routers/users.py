@@ -20,7 +20,7 @@ Base.metadata.create_all(bind=engine)
 router = APIRouter()
 
 
-@router.get("/users/me", response_model=User)
+@router.get("/users/me")
 async def show(current_user: User = Depends(get_current_user)):
     return current_user
 

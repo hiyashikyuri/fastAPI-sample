@@ -16,9 +16,11 @@ from ..database import Base
 def SessionLocal():
     # settings of test database
     TEST_SQLALCHEMY_DATABASE_URL = "sqlite:///./test_temp.db"
-    engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+    engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL,
+                           connect_args={"check_same_thread": False})
 
-    assert not database_exists(TEST_SQLALCHEMY_DATABASE_URL), "Test database already exists. Aborting tests."
+    assert not database_exists(TEST_SQLALCHEMY_DATABASE_URL), \
+        "Test database already exists. Aborting tests."
 
     # Create test database and tables
     Base.metadata.create_all(engine)
@@ -37,4 +39,3 @@ def set_authorization():
     # どうにかしてse_authoriationの中身を渡したい
 
     print('set_authorization')
-
