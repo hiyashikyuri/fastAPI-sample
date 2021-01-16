@@ -52,13 +52,10 @@ def set_authorization():
     }
 
 
-post = {"title": "title", "body": "body", "user_id": None}
-
-
 @temp_db
 def test_create():
     credential = set_authorization()
-    post["user_id"] = credential["user"]["id"]
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
     response = client.post("/posts", data=json.dumps(post),
                            headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
     assert response.status_code == 200, response.text
@@ -66,15 +63,16 @@ def test_create():
     assert data["title"] == post["title"]
     assert "id" in data
 
-#
-# @temp_db
-# def test_find_one():
-#     user = create_user().json()
-#     post["user_id"] = user["id"]
-#     created_post_data = client.post("/posts", json=post)
-#
-#     searched_post = client.get("/posts/{post_id}".format(post_id=created_post_data.json()["id"]))
-#     assert searched_post.status_code == 200, searched_post.text
-#     data = searched_post.json()
-#     assert "title" in data
-#     assert "body" in data
+
+@temp_db
+def test_find_one():
+    credential = set_authorization()
+    post = {"title": "title", "body": "body", "user_id": credential["user"]["id"]}
+    created_post_data = client.post("/posts", data=json.dumps(post),
+                                    headers={'Authorization': 'Bearer {}'.format(credential["access_token"])}).json()
+    searched_post = client.get("/posts/{post_id}".format(post_id=created_post_data["id"]),
+                               headers={'Authorization': 'Bearer {}'.format(credential["access_token"])})
+    assert searched_post.status_code == 200, searched_post.text
+    data = searched_post.json()
+    assert "title" in data
+    assert "body" in data
